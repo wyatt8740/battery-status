@@ -38,3 +38,13 @@ standardized method for polling battery information on computers. Thus, for
 instance, FreeBSD uses `sysctl` to get battery information, Linux uses sysfs
 (specifically, `/sys/class/power_supply/` directories), and I think OpenBSD
 uses `sysctl` as well.
+
+## License
+
+This script is licensed under the "three-clause BSD" license.
+
+Please refer to `LICENSE.txt` for the license terms.
+
+If this license is unacceptable, feel free to drop me a line and let me know
+why. I'll probably be willing to grant different terms if asked. Not that I
+really anticipate any major problems with a BSD license.
