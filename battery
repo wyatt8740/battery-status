@@ -1,0 +1,38 @@
+#! /bin/sh
+# should work in any bourne shell (basically 'not [t]csh')
+i=0
+BATPREFIX='/sys/class/power_supply'
+BATNAMECONVENTION='BAT'
+if [ -e "$BATPREFIX"'/PMU_battery_'* ]; then # Powerbook PMU
+  BATNAMECONVENTION='PMU_battery_'
+fi
+for file in "$BATPREFIX"'/'"$BATNAMECONVENTION"*; do
+  i=`expr "$i" '+' '1'`
+  BATMAX=0
+  BATCUR=0
+  if [ -e "$file"'/energy_now' ]; then
+    # sometimes I get energy_* instead of charge_* for some reason
+    # one is in microamps(?)
+    # the other is in microwatts(?).
+
+    # If SI units are assumed, then energy should be microamps * time, I think.
+
+    # But it doesn't matter anyway; all we really need is the ratio of now vs.
+    # full, I think.
+    BATMAX=`cat "$file"'/energy_full'`
+    BATCUR=`cat "$file"'/energy_now'`
+  elif [ -e "$file"'/energy_avg' ]; then # Powerbook (G4, at least) PMU does this
+    BATMAX=`cat "$file"'/energy_full'`
+    BATCUR=`cat "$file"'/energy_avg'`
+  else
+    BATMAX=`cat "$file"'/charge_full'`
+    BATCUR=`cat "$file"'/charge_now'`
+  fi
+  echo 'Battery #'"$i"':'
+  # do calculation, print without newline, tack percentage sign to end of line.
+  # I wish we all used `dc` so I didn't have to think about order of operations
+  printf `expr "$BATCUR" '*' 100 '/' "$BATMAX"`'%%'
+  printf "\t"
+  cat "$file""/status"| while read line; do printf "$line"; done
+  echo
+done
